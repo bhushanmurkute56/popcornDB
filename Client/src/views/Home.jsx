@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import axios from "axios"
 import MovieCard from "./../components/MovieCard"
 import {Search as SearchIcon} from "lucide-react"
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast'
+import imageNotFound from "./../assets/Error.png"
+import { API_URL }from "./../Contraints"
 
 function Home() {
     const [movies, setMovies] = useState([]);
@@ -10,7 +12,7 @@ function Home() {
     const [error, setError] = useState([]);
 
     const loadMovies = async () => {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/movies`)
+        const response = await axios.get(`${API_URL}/movies`)
         setMovies(response.data.data);
     };
 
@@ -19,7 +21,7 @@ function Home() {
     const searchMovies = async () => {
         toast.loading(`Search...`, {id : "searching"});
         try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/movies/search?q=${search}`);
+        const response = await axios.get(`${API_URL}/movies/search?q=${search}`);
         toast.dismiss();
         setMovies(response.data.data);
         setError("");
@@ -36,8 +38,8 @@ function Home() {
     useEffect(() => {searchMovies()}, [search])
 
   return (
-    <div>
-        <div className='rounded-full w-fit mx-auto border py-2 my-2 px-6'>
+    <div className='bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-500 min-h-screen pt-2'>
+        <div className='rounded-full w-fit mx-auto border py-2 px-6 bg-white/30 backdrop-blur-sm shadow-lg'>
             <input 
                 type="text"
                 placeholder='Search Movie...' 
@@ -48,7 +50,10 @@ function Home() {
             <SearchIcon className='inline-block cursor-pointer'/>
         </div>
 
-            {error ? <div className='text-center text-3xl mt-4'>{error}</div> : null}
+            {error ? <div className='text-center text-3xl mt-10'>
+                {error}
+                <img src={imageNotFound} alt="" className='h-100 w-100 mx-auto' />
+            </div> : null}
 
         <div className='flex flex-wrap justify-center'>
         {movies.map((movieObj) => {
@@ -56,12 +61,14 @@ function Home() {
 
             return (
                 <MovieCard 
+                _id={_id}
                 key = {_id}
                 title = {title}
                 images = {images}
                 category = {category}
                 year = {year}
                 rating = {rating}
+                loadMovies={loadMovies}
                 />
             )
         })}
